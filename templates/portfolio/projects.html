@@ -1,0 +1,210 @@
+{% extends 'portfolio/base.html' %}
+{% load static %}
+
+{% block title %}Dự án - CV Portfolio{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: 100px;">
+    <!-- Page Header -->
+    <div class="row">
+        <div class="col-12 text-center mb-5" data-aos="fade-up">
+            <h1 class="section-title">Dự án của tôi</h1>
+            <p class="text-muted lead">Khám phá những dự án tôi đã thực hiện</p>
+        </div>
+    </div>
+
+    <!-- Project Filter -->
+    <div class="row">
+        <div class="col-12 text-center mb-4">
+            <div class="project-filter" data-aos="fade-up">
+                <button class="btn filter-btn active" data-filter="all">Tất cả</button>
+                {% for type_value, type_label in project_types %}
+                    <button class="btn filter-btn" data-filter="{{ type_value }}">{{ type_label }}</button>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Projects Grid -->
+    <div class="row">
+        {% for project in projects %}
+            <div class="col-md-6 col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:100 }}">
+                <div class="project-card bg-white rounded shadow-sm overflow-hidden h-100" data-category="{{ project.project_type }}">
+                    {% if project.image %}
+                        <img src="{{ project.image.url }}" alt="{{ project.title }}" 
+                             class="card-img-top project-img" style="height: 250px; object-fit: cover;">
+                    {% else %}
+                        <div class="project-placeholder bg-light d-flex align-items-center justify-content-center" 
+                             style="height: 250px;">
+                            <i class="fas fa-image fa-3x text-muted"></i>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title mb-0">{{ project.title }}</h5>
+                            {% if project.featured %}
+                                <span class="badge bg-warning text-dark">
+                                    <i class="fas fa-star"></i> Nổi bật
+                                </span>
+                            {% endif %}
+                        </div>
+                        
+                        <p class="card-text text-muted flex-grow-1">{{ project.description|truncatewords:20 }}</p>
+                        
+                        <div class="project-meta mb-3">
+                            <small class="text-muted d-block mb-2">
+                                <i class="fas fa-tag"></i> {{ project.get_project_type_display }}
+                            </small>
+                            <small class="text-muted d-block mb-2">
+                                <i class="fas fa-calendar"></i> {{ project.created_date|date:"d/m/Y" }}
+                            </small>
+                            <div class="technologies mb-2">
+                                <small class="text-primary">
+                                    <i class="fas fa-code"></i> {{ project.technologies|truncatewords:5 }}
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <div class="project-actions">
+                            <a href="{% url 'project_detail' project.pk %}" class="btn btn-primary btn-sm me-2">
+                                <i class="fas fa-eye"></i> Chi tiết
+                            </a>
+                            {% if project.demo_url %}
+                                <a href="{{ project.demo_url }}" target="_blank" class="btn btn-success btn-sm me-2">
+                                    <i class="fas fa-external-link-alt"></i> Demo
+                                </a>
+                            {% endif %}
+                            {% if project.github_url %}
+                                <a href="{{ project.github_url }}" target="_blank" class="btn btn-dark btn-sm">
+                                    <i class="fab fa-github"></i> Code
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12 text-center py-5">
+                <i class="fas fa-folder-open fa-5x text-muted mb-3"></i>
+                <h4 class="text-muted">Chưa có dự án nào</h4>
+                <p class="text-muted">Các dự án sẽ được hiển thị ở đây khi được thêm vào.</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if projects.has_other_pages %}
+        <div class="row">
+            <div class="col-12">
+                <nav aria-label="Page navigation" data-aos="fade-up">
+                    <ul class="pagination justify-content-center">
+                        {% if projects.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if current_type %}&type={{ current_type }}{% endif %}">
+                                    <i class="fas fa-angle-double-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ projects.previous_page_number }}{% if current_type %}&type={{ current_type }}{% endif %}">
+                                    <i class="fas fa-angle-left"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        {% for num in projects.paginator.page_range %}
+                            {% if projects.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                            {% elif num > projects.number|add:'-3' and num < projects.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}{% if current_type %}&type={{ current_type }}{% endif %}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if projects.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ projects.next_page_number }}{% if current_type %}&type={{ current_type }}{% endif %}">
+                                    <i class="fas fa-angle-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ projects.paginator.num_pages }}{% if current_type %}&type={{ current_type }}{% endif %}">
+                                    <i class="fas fa-angle-double-right"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<!-- CTA Section -->
+<section class="py-5 bg-light mt-5">
+    <div class="container text-center">
+        <div class="row">
+            <div class="col-lg-8 mx-auto" data-aos="fade-up">
+                <h3 class="mb-4">Có ý tưởng dự án?</h3>
+                <p class="lead mb-4">Hãy liên hệ với tôi để thảo luận về dự án của bạn</p>
+                <a href="{% url 'contact' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-envelope"></i> Liên hệ ngay
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Project filter functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const projectCards = document.querySelectorAll('.project-card');
+
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const filter = this.getAttribute('data-filter');
+            
+            // Update active button
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Filter projects with animation
+            projectCards.forEach((card, index) => {
+                const category = card.getAttribute('data-category');
+                const cardParent = card.closest('.col-md-6');
+                
+                if (filter === 'all' || category === filter) {
+                    cardParent.style.display = 'block';
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'scale(1)';
+                    }, index * 100);
+                } else {
+                    card.style.opacity = '0';
+                    card.style.transform = 'scale(0.8)';
+                    setTimeout(() => {
+                        cardParent.style.display = 'none';
+                    }, 300);
+                }
+            });
+        });
+    });
+
+    // Initialize filter based on URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const typeParam = urlParams.get('type');
+    if (typeParam) {
+        const targetButton = document.querySelector(`[data-filter="${typeParam}"]`);
+        if (targetButton) {
+            targetButton.click();
+        }
+    }
+});
+</script>
+{% endblock %}

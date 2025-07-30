@@ -1,0 +1,328 @@
+{% extends 'portfolio/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Liên hệ - CV Portfolio{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: 100px;">
+    <!-- Page Header -->
+    <div class="row">
+        <div class="col-12 text-center mb-5" data-aos="fade-up">
+            <h1 class="section-title">Liên hệ với tôi</h1>
+            <p class="text-muted lead">Hãy để lại tin nhắn, tôi sẽ phản hồi sớm nhất có thể</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Contact Information -->
+        <div class="col-lg-4 mb-5" data-aos="fade-right">
+            <div class="contact-info bg-white p-4 rounded shadow-sm h-100">
+                <h3 class="mb-4">Thông tin liên hệ</h3>
+                
+                {% if profile %}
+                    <div class="contact-item mb-4">
+                        <div class="d-flex align-items-center">
+                            <div class="contact-icon me-3">
+                                <i class="fas fa-envelope fa-2x text-primary"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1">Email</h6>
+                                <a href="mailto:{{ profile.email }}" class="text-muted">{{ profile.email }}</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="contact-item mb-4">
+                        <div class="d-flex align-items-center">
+                            <div class="contact-icon me-3">
+                                <i class="fas fa-phone fa-2x text-primary"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1">Điện thoại</h6>
+                                <a href="tel:{{ profile.phone }}" class="text-muted">{{ profile.phone }}</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="contact-item mb-4">
+                        <div class="d-flex align-items-start">
+                            <div class="contact-icon me-3">
+                                <i class="fas fa-map-marker-alt fa-2x text-primary"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1">Địa chỉ</h6>
+                                <p class="text-muted mb-0">{{ profile.address }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Social Links -->
+                <div class="social-links mt-4">
+                    <h6 class="mb-3">Kết nối với tôi</h6>
+                    <div class="d-flex">
+                        {% if profile.github %}
+                            <a href="{{ profile.github }}" target="_blank" class="btn btn-outline-dark btn-sm me-2">
+                                <i class="fab fa-github"></i> GitHub
+                            </a>
+                        {% endif %}
+                        {% if profile.linkedin %}
+                            <a href="{{ profile.linkedin }}" target="_blank" class="btn btn-outline-primary btn-sm me-2">
+                                <i class="fab fa-linkedin"></i> LinkedIn
+                            </a>
+                        {% endif %}
+                        {% if profile.website %}
+                            <a href="{{ profile.website }}" target="_blank" class="btn btn-outline-info btn-sm">
+                                <i class="fas fa-globe"></i> Website
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Availability Status -->
+                <div class="availability-status mt-4 p-3 bg-light rounded">
+                    <div class="d-flex align-items-center">
+                        <div class="status-indicator me-2">
+                            <div class="status-dot bg-success"></div>
+                        </div>
+                        <div>
+                            <h6 class="mb-1">Trạng thái</h6>
+                            <small class="text-success">Sẵn sàng nhận dự án mới</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Form -->
+        <div class="col-lg-8" data-aos="fade-left">
+            <div class="contact-form">
+                <h3 class="mb-4">Gửi tin nhắn</h3>
+                
+                <form method="post" id="contact-form" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="id_name" class="form-label">Họ và tên *</label>
+                            <input type="text" class="form-control" name="name" id="id_name" required>
+                            <div class="invalid-feedback">
+                                Vui lòng nhập họ và tên.
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="id_email" class="form-label">Email *</label>
+                            <input type="email" class="form-control" name="email" id="id_email" required>
+                            <div class="invalid-feedback">
+                                Vui lòng nhập email hợp lệ.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_subject" class="form-label">Chủ đề *</label>
+                        <input type="text" class="form-control" name="subject" id="id_subject" required>
+                        <div class="invalid-feedback">
+                            Vui lòng nhập chủ đề tin nhắn.
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="id_message" class="form-label">Tin nhắn *</label>
+                        <textarea class="form-control" name="message" id="id_message" rows="6" required></textarea>
+                        <div class="invalid-feedback">
+                            Vui lòng nhập nội dung tin nhắn.
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-paper-plane"></i> Gửi tin nhắn
+                    </button>
+                </form>
+
+                <!-- Contact Success Message -->
+                <div id="contact-success" class="alert alert-success mt-4" style="display: none;">
+                    <i class="fas fa-check-circle"></i>
+                    Cảm ơn bạn đã liên hệ! Tôi sẽ phản hồi sớm nhất có thể.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="faq-section" data-aos="fade-up">
+                <h3 class="text-center mb-4">Câu hỏi thường gặp</h3>
+                <div class="accordion" id="faqAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq1">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse1">
+                                Thời gian phản hồi email là bao lâu?
+                            </button>
+                        </h2>
+                        <div id="faqCollapse1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Tôi thường phản hồi email trong vòng 24-48 giờ làm việc. Đối với những yêu cầu khẩn cấp, vui lòng ghi rõ trong chủ đề email.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq2">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse2">
+                                Bạn nhận freelance project không?
+                            </button>
+                        </h2>
+                        <div id="faqCollapse2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Có, tôi hiện đang nhận các dự án freelance. Hãy liên hệ với tôi để thảo luận về yêu cầu và timeline của dự án.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq3">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse3">
+                                Công nghệ nào bạn chuyên về?
+                            </button>
+                        </h2>
+                        <div id="faqCollapse3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Tôi chuyên về Python/Django, JavaScript, React, và các công nghệ web hiện đại. Bạn có thể xem chi tiết trong phần kỹ năng trên trang chủ.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.contact-icon {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 123, 255, 0.1);
+    border-radius: 50%;
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7);
+    }
+    
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 10px rgba(40, 167, 69, 0);
+    }
+    
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+    }
+}
+
+.contact-form {
+    background: white;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: rgba(0, 123, 255, 0.1);
+    color: #007bff;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Contact form AJAX submission
+    const contactForm = document.getElementById('contact-form');
+    const successMessage = document.getElementById('contact-success');
+    
+    contactForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if (!contactForm.checkValidity()) {
+            contactForm.classList.add('was-validated');
+            return;
+        }
+        
+        const formData = new FormData(contactForm);
+        const submitBtn = contactForm.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        
+        // Show loading state
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Đang gửi...';
+        submitBtn.disabled = true;
+        
+        fetch('{% url "ajax_contact" %}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                successMessage.style.display = 'block';
+                contactForm.reset();
+                contactForm.classList.remove('was-validated');
+                
+                // Scroll to success message
+                successMessage.scrollIntoView({ behavior: 'smooth' });
+                
+                // Hide success message after 5 seconds
+                setTimeout(() => {
+                    successMessage.style.display = 'none';
+                }, 5000);
+            } else {
+                alert('Có lỗi xảy ra. Vui lòng thử lại.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Có lỗi xảy ra. Vui lòng thử lại.');
+        })
+        .finally(() => {
+            // Reset button
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        });
+    });
+    
+    // Form validation
+    contactForm.addEventListener('input', function(e) {
+        const field = e.target;
+        if (field.checkValidity()) {
+            field.classList.remove('is-invalid');
+            field.classList.add('is-valid');
+        } else {
+            field.classList.remove('is-valid');
+            field.classList.add('is-invalid');
+        }
+    });
+});
+</script>
+{% endblock %}
