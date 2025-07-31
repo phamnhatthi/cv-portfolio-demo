@@ -10,9 +10,9 @@ ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     '.onrender.com',  # For Render deployment
-    # Add your custom domain here when you connect it
-    # 'your-domain.com',
-    # 'www.your-domain.com',
+    # Custom domain
+    'phamnhatthi.info',
+    'www.phamnhatthi.info',
 ]
 
 # Database configuration - using SQLite for demo (includes all data)
