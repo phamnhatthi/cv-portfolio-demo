@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: cv-portfolio-demo
+    env: python
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --no-input
+    startCommand: gunicorn cv_project.wsgi:application
+    envVars:
+      - key: DEBUG
+        value: False
+      - key: DJANGO_SETTINGS_MODULE
+        value: cv_project.production_settings
