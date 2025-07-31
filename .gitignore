@@ -1,18 +1,26 @@
-# Django
-*.log
-*.pot
+# Python
 *.pyc
 __pycache__/
-local_settings.py
-# db.sqlite3  # Commented out to include database
-# db.sqlite3-journal  # Commented out to include database
-# media/  # Commented out to include media files
-
-# Virtual Environment (DO NOT COMMIT - creates cross-platform issues)
-.venv/
-venv/
+*.pyo
+*.pyd
+.Python
 env/
-ENV/
+venv/
+.venv/
+.env
+.venv-1/
+
+# Django
+*.log
+local_settings.py
+# Keep database for demo deployment
+# db.sqlite3
+# db.sqlite3-journal
+# Keep media files for demo
+# media/
+
+# Static files (generated)
+/staticfiles/
 
 # IDE
 .vscode/
@@ -30,51 +38,6 @@ ENV/
 ehthumbs.db
 Thumbs.db
 
-# Secret keys
-.env
-secrets.py
-
-# Static files (usually collected in production)
-staticfiles/
-static_root/
-
-# Cache
-.cache/
-
-# Coverage reports
-htmlcov/
-.coverage
-.coverage.*
-coverage.xml
-
-# Pytest
-.pytest_cache/
-
-# Node modules (if using npm/yarn)
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-# Backup files
-*.bak
-*.backup
+# Deployment
+*.zip
+*.tar.gz

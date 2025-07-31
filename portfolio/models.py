@@ -1,138 +1,144 @@
 from django.db import models
-from django.urls import reverse
+
 
 class Profile(models.Model):
-    """Model cho thông tin cá nhân"""
-    full_name = models.CharField(max_length=100, verbose_name="Họ và tên")
-    title = models.CharField(max_length=100, verbose_name="Chức danh")
-    email = models.EmailField(verbose_name="Email")
-    phone = models.CharField(max_length=20, verbose_name="Số điện thoại")
-    address = models.TextField(verbose_name="Địa chỉ")
-    about = models.TextField(verbose_name="Giới thiệu")
-    profile_image = models.ImageField(upload_to='profile/', verbose_name="Ảnh đại diện", blank=True)
-    linkedin = models.URLField(blank=True, verbose_name="LinkedIn")
-    github = models.URLField(blank=True, verbose_name="GitHub")
-    website = models.URLField(blank=True, verbose_name="Website")
+    """Model for personal profile information"""
+    full_name = models.CharField(max_length=100)
+    full_name_en = models.CharField(max_length=100, blank=True, help_text="English name")
+    email = models.EmailField()
+    phone = models.CharField(max_length=20)
+    address = models.CharField(max_length=200)
+    address_en = models.CharField(max_length=200, blank=True, help_text="English address")
+    linkedin = models.URLField(blank=True)
+    github = models.URLField(blank=True)
+    website = models.URLField(blank=True)
+    professional_summary = models.TextField()
+    professional_summary_en = models.TextField(blank=True, help_text="English professional summary")
+    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
     
     def __str__(self):
         return self.full_name
-    
-    class Meta:
-        verbose_name = "Hồ sơ"
-        verbose_name_plural = "Hồ sơ"
 
-class Skill(models.Model):
-    """Model cho kỹ năng"""
-    SKILL_LEVELS = [
-        ('beginner', 'Mới bắt đầu'),
-        ('intermediate', 'Trung cấp'),
-        ('advanced', 'Nâng cao'),
-        ('expert', 'Chuyên gia'),
-    ]
-    
-    name = models.CharField(max_length=100, verbose_name="Tên kỹ năng")
-    level = models.CharField(max_length=20, choices=SKILL_LEVELS, verbose_name="Trình độ")
-    percentage = models.IntegerField(default=0, verbose_name="Phần trăm thành thạo")
-    
-    def __str__(self):
-        return self.name
-    
-    class Meta:
-        verbose_name = "Kỹ năng"
-        verbose_name_plural = "Kỹ năng"
 
 class Experience(models.Model):
-    """Model cho kinh nghiệm làm việc"""
-    company = models.CharField(max_length=100, verbose_name="Công ty")
-    position = models.CharField(max_length=100, verbose_name="Vị trí")
-    start_date = models.DateField(verbose_name="Ngày bắt đầu")
-    end_date = models.DateField(null=True, blank=True, verbose_name="Ngày kết thúc")
-    description = models.TextField(verbose_name="Mô tả công việc")
-    is_current = models.BooleanField(default=False, verbose_name="Hiện tại")
-    
-    def __str__(self):
-        return f"{self.position} tại {self.company}"
+    """Model for work experience"""
+    job_title = models.CharField(max_length=100)
+    job_title_en = models.CharField(max_length=100, blank=True, help_text="English job title")
+    company = models.CharField(max_length=100)
+    company_en = models.CharField(max_length=100, blank=True, help_text="English company name")
+    location = models.CharField(max_length=100)
+    location_en = models.CharField(max_length=100, blank=True, help_text="English location")
+    start_date = models.DateField()
+    end_date = models.DateField(null=True, blank=True)
+    is_current = models.BooleanField(default=False)
+    description = models.TextField()
+    description_en = models.TextField(blank=True, help_text="English description")
+    order = models.IntegerField(default=0)
     
     class Meta:
-        verbose_name = "Kinh nghiệm"
-        verbose_name_plural = "Kinh nghiệm"
         ordering = ['-start_date']
+    
+    def __str__(self):
+        return f"{self.job_title} at {self.company}"
+
 
 class Education(models.Model):
-    """Model cho học vấn"""
-    institution = models.CharField(max_length=100, verbose_name="Trường")
-    degree = models.CharField(max_length=100, verbose_name="Bằng cấp")
-    field_of_study = models.CharField(max_length=100, verbose_name="Chuyên ngành")
-    start_date = models.DateField(verbose_name="Ngày bắt đầu")
-    end_date = models.DateField(null=True, blank=True, verbose_name="Ngày kết thúc")
-    gpa = models.DecimalField(max_digits=3, decimal_places=2, null=True, blank=True, verbose_name="GPA")
+    """Model for educational background"""
+    degree = models.CharField(max_length=100)
+    degree_en = models.CharField(max_length=100, blank=True, help_text="English degree")
+    institution = models.CharField(max_length=100)
+    institution_en = models.CharField(max_length=100, blank=True, help_text="English institution")
+    location = models.CharField(max_length=100)
+    location_en = models.CharField(max_length=100, blank=True, help_text="English location")
+    start_date = models.DateField()
+    end_date = models.DateField(null=True, blank=True)
+    is_current = models.BooleanField(default=False)
+    gpa = models.CharField(max_length=10, blank=True)
+    description = models.TextField(blank=True)
+    description_en = models.TextField(blank=True, help_text="English description")
+    order = models.IntegerField(default=0)
+    
+    class Meta:
+        ordering = ['-start_date']
     
     def __str__(self):
         return f"{self.degree} - {self.institution}"
-    
-    class Meta:
-        verbose_name = "Học vấn"
-        verbose_name_plural = "Học vấn"
-        ordering = ['-start_date']
 
-class Project(models.Model):
-    """Model cho dự án"""
-    PROJECT_TYPES = [
-        ('web', 'Web Application'),
-        ('mobile', 'Mobile App'),
-        ('desktop', 'Desktop App'),
-        ('ai', 'AI/Machine Learning'),
-        ('game', 'Game'),
-        ('other', 'Khác'),
+
+class Skill(models.Model):
+    """Model for skills"""
+    SKILL_CATEGORIES = [
+        ('technical', 'Technical Skills'),
+        ('programming', 'Programming Languages'),
+        ('tools', 'Tools & Technologies'),
+        ('soft', 'Soft Skills'),
+        ('languages', 'Languages'),
     ]
     
-    title = models.CharField(max_length=100, verbose_name="Tên dự án")
-    description = models.TextField(verbose_name="Mô tả dự án")
-    technologies = models.TextField(verbose_name="Công nghệ sử dụng")
-    project_type = models.CharField(max_length=20, choices=PROJECT_TYPES, verbose_name="Loại dự án")
-    image = models.ImageField(upload_to='projects/', verbose_name="Hình ảnh", blank=True)
-    video = models.FileField(upload_to='projects/videos/', verbose_name="Video demo", blank=True)
-    github_url = models.URLField(blank=True, verbose_name="GitHub URL")
-    demo_url = models.URLField(blank=True, verbose_name="Demo URL")
-    created_date = models.DateField(verbose_name="Ngày tạo")
-    featured = models.BooleanField(default=False, verbose_name="Dự án nổi bật")
+    name = models.CharField(max_length=50)
+    name_en = models.CharField(max_length=50, blank=True, help_text="English skill name")
+    category = models.CharField(max_length=20, choices=SKILL_CATEGORIES)
+    proficiency_level = models.IntegerField(default=5, help_text="Scale of 1-10")
+    order = models.IntegerField(default=0)
+    
+    class Meta:
+        ordering = ['category', 'order', 'name']
+    
+    def __str__(self):
+        return f"{self.name} ({self.get_category_display()})"
+
+
+class Project(models.Model):
+    """Model for portfolio projects"""
+    title = models.CharField(max_length=200, verbose_name="Project Title")
+    title_en = models.CharField(max_length=200, blank=True, help_text="English project title")
+    
+    description = models.TextField(verbose_name="Project Description")
+    description_en = models.TextField(blank=True, help_text="English project description")
+    
+    # Video field for project demonstration
+    video = models.FileField(upload_to='project_videos/', blank=True, null=True, 
+                           help_text="Upload MP4 video file of the project")
+    
+    # Technologies and libraries used
+    technologies = models.TextField(help_text="List technologies, frameworks, and libraries used (comma separated)")
+    technologies_en = models.TextField(blank=True, help_text="English technologies list")
+    
+    # Project links
+    github_url = models.URLField(blank=True, verbose_name="GitHub Repository")
+    live_demo_url = models.URLField(blank=True, verbose_name="Live Demo URL")
+    
+    # Project thumbnail/image
+    thumbnail = models.ImageField(upload_to='project_thumbnails/', blank=True, null=True,
+                                help_text="Project thumbnail image")
+    
+    # Project dates
+    start_date = models.DateField(verbose_name="Project Start Date")
+    end_date = models.DateField(blank=True, null=True, verbose_name="Project End Date")
+    is_ongoing = models.BooleanField(default=False, verbose_name="Is this project ongoing?")
+    
+    # Project status and display order
+    is_featured = models.BooleanField(default=False, help_text="Show this project prominently")
+    order = models.IntegerField(default=0, help_text="Display order (lower numbers appear first)")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-is_featured', 'order', '-start_date']
+        verbose_name = "Project"
+        verbose_name_plural = "Projects"
     
     def __str__(self):
         return self.title
     
-    def get_absolute_url(self):
-        return reverse('project_detail', kwargs={'pk': self.pk})
+    @property
+    def technology_list(self):
+        """Return technologies as a list"""
+        return [tech.strip() for tech in self.technologies.split(',') if tech.strip()]
     
-    class Meta:
-        verbose_name = "Dự án"
-        verbose_name_plural = "Dự án"
-        ordering = ['-created_date']
-
-class ProjectImage(models.Model):
-    """Model cho ảnh bổ sung của dự án"""
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='additional_images')
-    image = models.ImageField(upload_to='projects/gallery/')
-    caption = models.CharField(max_length=200, blank=True, verbose_name="Chú thích")
-    
-    def __str__(self):
-        return f"Ảnh cho {self.project.title}"
-    
-    class Meta:
-        verbose_name = "Ảnh dự án"
-        verbose_name_plural = "Ảnh dự án"
-
-class Contact(models.Model):
-    """Model cho tin nhắn liên hệ"""
-    name = models.CharField(max_length=100, verbose_name="Tên")
-    email = models.EmailField(verbose_name="Email")
-    subject = models.CharField(max_length=200, verbose_name="Chủ đề")
-    message = models.TextField(verbose_name="Tin nhắn")
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Thời gian gửi")
-    
-    def __str__(self):
-        return f"Tin nhắn từ {self.name}"
-    
-    class Meta:
-        verbose_name = "Liên hệ"
-        verbose_name_plural = "Liên hệ"
-        ordering = ['-created_at']
+    @property
+    def technology_list_en(self):
+        """Return English technologies as a list"""
+        if self.technologies_en:
+            return [tech.strip() for tech in self.technologies_en.split(',') if tech.strip()]
+        return self.technology_list

@@ -1,0 +1,179 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ project.title }} - Project Details</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'portfolio/css/projects.css' %}">
+</head>
+<body>
+    <!-- Language Toggle Switch -->
+    <div class="language-toggle">
+        <span class="lang-label active" id="vi-label">VI</span>
+        <div class="toggle-switch" id="langToggle">
+            <div class="toggle-slider"></div>
+        </div>
+        <span class="lang-label" id="en-label">EN</span>
+    </div>
+
+    <!-- Back Button -->
+    <a href="{% url 'portfolio:projects' %}" class="back-button">
+        <i class="fas fa-arrow-left"></i>
+        <span class="lang-vi">Quay lại</span>
+        <span class="lang-en">Back</span>
+    </a>
+
+    <div class="main-container">
+        <div class="project-detail-container">
+            <!-- Project Header -->
+            <div class="project-header">
+                <h1 class="project-title">
+                    <span class="lang-vi">{{ project.title }}</span>
+                    <span class="lang-en">{{ project.title_en|default:project.title }}</span>
+                    {% if project.is_featured %}
+                    <span class="featured-badge">
+                        <i class="fas fa-star"></i>
+                        <span class="lang-vi">Nổi bật</span>
+                        <span class="lang-en">Featured</span>
+                    </span>
+                    {% endif %}
+                </h1>
+                
+                <div class="project-meta">
+                    <span class="project-date">
+                        <i class="fas fa-calendar"></i>
+                        {{ project.start_date|date:"M Y" }} - 
+                        {% if project.is_ongoing %}
+                            <span class="lang-vi">Hiện tại</span>
+                            <span class="lang-en">Present</span>
+                            <span class="ongoing-badge">
+                                <span class="lang-vi">Đang tiến hành</span>
+                                <span class="lang-en">Ongoing</span>
+                            </span>
+                        {% else %}
+                            {{ project.end_date|date:"M Y" }}
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Project Video -->
+            {% if project.video %}
+            <div class="project-video-section">
+                <h2 class="section-title">
+                    <i class="fas fa-play-circle"></i>
+                    <span class="lang-vi">Video Demo</span>
+                    <span class="lang-en">Video Demo</span>
+                </h2>
+                <div class="video-container">
+                    <video controls preload="metadata" class="w-100">
+                        <source src="{{ project.video.url }}" type="video/mp4">
+                        <span class="lang-vi">Trình duyệt của bạn không hỗ trợ video.</span>
+                        <span class="lang-en">Your browser does not support the video tag.</span>
+                    </video>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Project Description -->
+            <div class="project-description-section">
+                <h2 class="section-title">
+                    <i class="fas fa-file-text"></i>
+                    <span class="lang-vi">Mô tả dự án</span>
+                    <span class="lang-en">Project Description</span>
+                </h2>
+                <div class="description-content">
+                    <div class="lang-vi">{{ project.description|linebreaks }}</div>
+                    <div class="lang-en">{{ project.description_en|default:project.description|linebreaks }}</div>
+                </div>
+            </div>
+
+            <!-- Technologies Used -->
+            <div class="technologies-section">
+                <h2 class="section-title">
+                    <i class="fas fa-cogs"></i>
+                    <span class="lang-vi">Công nghệ & Thư viện</span>
+                    <span class="lang-en">Technologies & Libraries</span>
+                </h2>
+                <div class="tech-grid">
+                    <div class="lang-vi">
+                        {% for tech in project.technology_list %}
+                            <span class="tech-badge">{{ tech }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="lang-en">
+                        {% for tech in project.technology_list_en %}
+                            <span class="tech-badge">{{ tech }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project Links -->
+            {% if project.github_url or project.live_demo_url %}
+            <div class="project-links-section">
+                <h2 class="section-title">
+                    <i class="fas fa-link"></i>
+                    <span class="lang-vi">Liên kết dự án</span>
+                    <span class="lang-en">Project Links</span>
+                </h2>
+                <div class="links-container">
+                    {% if project.github_url %}
+                    <a href="{{ project.github_url }}" target="_blank" class="project-link-large">
+                        <i class="fab fa-github"></i>
+                        <div>
+                            <strong>GitHub Repository</strong>
+                            <p>
+                                <span class="lang-vi">Xem mã nguồn và tài liệu</span>
+                                <span class="lang-en">View source code and documentation</span>
+                            </p>
+                        </div>
+                    </a>
+                    {% endif %}
+                    
+                    {% if project.live_demo_url %}
+                    <a href="{{ project.live_demo_url }}" target="_blank" class="project-link-large">
+                        <i class="fas fa-external-link-alt"></i>
+                        <div>
+                            <strong>
+                                <span class="lang-vi">Demo Trực Tiếp</span>
+                                <span class="lang-en">Live Demo</span>
+                            </strong>
+                            <p>
+                                <span class="lang-vi">Trải nghiệm dự án trực tiếp</span>
+                                <span class="lang-en">Experience the project live</span>
+                            </p>
+                        </div>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Navigation -->
+            <div class="navigation-section">
+                <a href="{% url 'portfolio:projects' %}" class="nav-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    <span class="lang-vi">Quay lại trang dự án</span>
+                    <span class="lang-en">Back to Projects</span>
+                </a>
+                
+                <a href="{% url 'portfolio:home' %}" class="nav-btn">
+                    <i class="fas fa-home"></i>
+                    <span class="lang-vi">Trang chủ</span>
+                    <span class="lang-en">Homepage</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'portfolio/js/projects.js' %}"></script>
+</body>
+</html>

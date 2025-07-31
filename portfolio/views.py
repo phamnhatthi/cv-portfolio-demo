@@ -1,123 +1,87 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib import messages
-from django.core.paginator import Paginator
-from django.http import JsonResponse
-from .models import Profile, Skill, Experience, Education, Project, Contact
-from .forms import ContactForm
+from django.shortcuts import render, get_object_or_404
+from .models import Profile, Experience, Education, Skill, Project
 
-def home(request):
-    """Trang chủ - CV chính"""
+
+def home_view(request):
+    """Home page view - Introduction for recruiters"""
     try:
         profile = Profile.objects.first()
     except Profile.DoesNotExist:
         profile = None
     
-    skills = Skill.objects.all()
-    experiences = Experience.objects.all()[:3]  # Hiển thị 3 kinh nghiệm gần nhất
-    education = Education.objects.all()[:3]  # Hiển thị 3 học vấn gần nhất
-    featured_projects = Project.objects.filter(featured=True)[:4]  # 4 dự án nổi bật
+    # Get latest experience for quick intro
+    latest_experience = Experience.objects.first() if Experience.objects.exists() else None
     
     context = {
         'profile': profile,
-        'skills': skills,
-        'experiences': experiences,
-        'education': education,
-        'featured_projects': featured_projects,
+        'latest_experience': latest_experience,
     }
     return render(request, 'portfolio/home.html', context)
 
-def projects(request):
-    """Trang danh sách tất cả dự án"""
-    project_list = Project.objects.all()
-    project_type = request.GET.get('type')
-    
-    if project_type:
-        project_list = project_list.filter(project_type=project_type)
-    
-    # Phân trang
-    paginator = Paginator(project_list, 6)  # 6 dự án mỗi trang
-    page_number = request.GET.get('page')
-    projects_page = paginator.get_page(page_number)
-    
-    # Lấy danh sách loại dự án để filter
-    project_types = Project.PROJECT_TYPES
-    
-    context = {
-        'projects': projects_page,
-        'project_types': project_types,
-        'current_type': project_type,
-    }
-    return render(request, 'portfolio/projects.html', context)
 
-def project_detail(request, pk):
-    """Trang chi tiết dự án"""
-    project = get_object_or_404(Project, pk=pk)
-    
-    # Lấy các dự án liên quan (cùng loại, trừ dự án hiện tại)
-    related_projects = Project.objects.filter(
-        project_type=project.project_type
-    ).exclude(pk=pk)[:3]
-    
-    context = {
-        'project': project,
-        'related_projects': related_projects,
-    }
-    return render(request, 'portfolio/project_detail.html', context)
-
-def contact(request):
-    """Trang liên hệ"""
-    if request.method == 'POST':
-        form = ContactForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Cảm ơn bạn đã liên hệ! Tôi sẽ phản hồi sớm nhất có thể.')
-            return redirect('contact')
-    else:
-        form = ContactForm()
-    
+def cv_view(request):
+    """CV page view"""
     try:
         profile = Profile.objects.first()
     except Profile.DoesNotExist:
         profile = None
     
-    context = {
-        'form': form,
-        'profile': profile,
-    }
-    return render(request, 'portfolio/contact.html', context)
-
-def about(request):
-    """Trang giới thiệu chi tiết"""
-    try:
-        profile = Profile.objects.first()
-    except Profile.DoesNotExist:
-        profile = None
-    
-    skills = Skill.objects.all()
     experiences = Experience.objects.all()
     education = Education.objects.all()
     
+    # Group skills by category with Vietnamese/English labels
+    skills_by_category = {}
+    skills = Skill.objects.all()
+    
+    # Category translations
+    category_translations = {
+        'technical': {'vi': 'Kỹ năng Kỹ thuật', 'en': 'Technical Skills'},
+        'programming': {'vi': 'Ngôn ngữ Lập trình', 'en': 'Programming Languages'},
+        'tools': {'vi': 'Công cụ & Công nghệ', 'en': 'Tools & Technologies'},
+        'soft': {'vi': 'Kỹ năng Mềm', 'en': 'Soft Skills'},
+        'languages': {'vi': 'Ngôn ngữ', 'en': 'Languages'},
+    }
+    
+    for skill in skills:
+        category_key = skill.category
+        if category_key not in skills_by_category:
+            skills_by_category[category_key] = {
+                'vi': category_translations.get(category_key, {}).get('vi', skill.get_category_display()),
+                'en': category_translations.get(category_key, {}).get('en', skill.get_category_display()),
+                'skills': []
+            }
+        skills_by_category[category_key]['skills'].append(skill)
+    
     context = {
         'profile': profile,
-        'skills': skills,
         'experiences': experiences,
         'education': education,
+        'skills_by_category': skills_by_category,
     }
-    return render(request, 'portfolio/about.html', context)
+    return render(request, 'portfolio/cv.html', context)
 
-def ajax_contact(request):
-    """AJAX endpoint cho form liên hệ"""
-    if request.method == 'POST':
-        form = ContactForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return JsonResponse({
-                'success': True, 
-                'message': 'Cảm ơn bạn đã liên hệ! Tôi sẽ phản hồi sớm nhất có thể.'
-            })
-        else:
-            return JsonResponse({
-                'success': False, 
-                'errors': form.errors
-            })
-    return JsonResponse({'success': False, 'message': 'Invalid request'})
+
+def projects_view(request):
+    """Projects page view - Display all projects with videos and details"""
+    projects = Project.objects.all()
+    featured_projects = projects.filter(is_featured=True)
+    regular_projects = projects.filter(is_featured=False)
+    
+    context = {
+        'projects': projects,
+        'featured_projects': featured_projects,
+        'regular_projects': regular_projects,
+        'page_title': 'Dự án đã thực hiện',
+        'page_title_en': 'Completed Projects',
+    }
+    return render(request, 'portfolio/projects.html', context)
+
+
+def project_detail_view(request, project_id):
+    """Individual project detail view"""
+    project = get_object_or_404(Project, id=project_id)
+    
+    context = {
+        'project': project,
+    }
+    return render(request, 'portfolio/project_detail.html', context)

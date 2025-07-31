@@ -1,62 +1,61 @@
 from django.contrib import admin
-from .models import Profile, Skill, Experience, Education, Project, ProjectImage, Contact
+from .models import Profile, Experience, Education, Skill, Project
+
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ['full_name', 'title', 'email']
+    list_display = ['full_name', 'email', 'phone']
     search_fields = ['full_name', 'email']
 
-@admin.register(Skill)
-class SkillAdmin(admin.ModelAdmin):
-    list_display = ['name', 'level', 'percentage']
-    list_filter = ['level']
-    search_fields = ['name']
 
 @admin.register(Experience)
 class ExperienceAdmin(admin.ModelAdmin):
-    list_display = ['position', 'company', 'start_date', 'end_date', 'is_current']
-    list_filter = ['is_current', 'start_date']
-    search_fields = ['position', 'company']
-    date_hierarchy = 'start_date'
+    list_display = ['job_title', 'company', 'start_date', 'end_date', 'is_current', 'order']
+    list_filter = ['is_current', 'company']
+    search_fields = ['job_title', 'company']
+    ordering = ['order', '-start_date']
+
 
 @admin.register(Education)
 class EducationAdmin(admin.ModelAdmin):
-    list_display = ['degree', 'institution', 'field_of_study', 'start_date', 'end_date']
-    list_filter = ['degree', 'start_date']
-    search_fields = ['institution', 'degree', 'field_of_study']
-    date_hierarchy = 'start_date'
+    list_display = ['degree', 'institution', 'start_date', 'end_date', 'is_current', 'order']
+    list_filter = ['is_current', 'institution']
+    search_fields = ['degree', 'institution']
+    ordering = ['order', '-start_date']
 
-class ProjectImageInline(admin.TabularInline):
-    model = ProjectImage
-    extra = 1
+
+@admin.register(Skill)
+class SkillAdmin(admin.ModelAdmin):
+    list_display = ['name', 'category', 'proficiency_level', 'order']
+    list_filter = ['category']
+    search_fields = ['name']
+    ordering = ['category', 'order']
+
 
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
-    list_display = ['title', 'project_type', 'created_date', 'featured']
-    list_filter = ['project_type', 'featured', 'created_date']
+    list_display = ['title', 'start_date', 'end_date', 'is_ongoing', 'is_featured', 'order']
+    list_filter = ['is_featured', 'is_ongoing', 'start_date']
     search_fields = ['title', 'description', 'technologies']
-    date_hierarchy = 'created_date'
-    inlines = [ProjectImageInline]
+    ordering = ['-is_featured', 'order', '-start_date']
     
     fieldsets = (
-        ('Thông tin cơ bản', {
-            'fields': ('title', 'description', 'project_type', 'technologies')
+        ('Basic Information', {
+            'fields': ('title', 'title_en', 'description', 'description_en')
         }),
         ('Media', {
-            'fields': ('image', 'video')
+            'fields': ('video', 'thumbnail')
         }),
-        ('Liên kết', {
-            'fields': ('github_url', 'demo_url')
+        ('Technologies', {
+            'fields': ('technologies', 'technologies_en')
         }),
-        ('Khác', {
-            'fields': ('created_date', 'featured')
+        ('Links', {
+            'fields': ('github_url', 'live_demo_url')
+        }),
+        ('Timeline', {
+            'fields': ('start_date', 'end_date', 'is_ongoing')
+        }),
+        ('Display Options', {
+            'fields': ('is_featured', 'order')
         }),
     )
-
-@admin.register(Contact)
-class ContactAdmin(admin.ModelAdmin):
-    list_display = ['name', 'email', 'subject', 'created_at']
-    list_filter = ['created_at']
-    search_fields = ['name', 'email', 'subject']
-    readonly_fields = ['created_at']
-    date_hierarchy = 'created_at'

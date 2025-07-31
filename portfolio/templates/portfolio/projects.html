@@ -1,0 +1,250 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if profile %}{{ profile.full_name }} - Projects{% else %}Phạm Nhật Thi - Projects{% endif %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'portfolio/css/projects.css' %}">
+</head>
+<body>
+    <!-- Language Toggle Switch -->
+    <div class="language-toggle">
+        <span class="lang-label active" id="vi-label">VI</span>
+        <div class="toggle-switch" id="langToggle">
+            <div class="toggle-slider"></div>
+        </div>
+        <span class="lang-label" id="en-label">EN</span>
+    </div>
+
+    <div class="main-container">
+        <div class="header-section">
+            <h1 class="header-title">
+                <span class="lang-vi">Dự Án Đã Thực Hiện</span>
+                <span class="lang-en">Completed Projects</span>
+            </h1>
+            <p class="header-subtitle">
+                <span class="lang-vi">Khám phá những dự án và thành tựu đã hoàn thành</span>
+                <span class="lang-en">Explore completed projects and achievements</span>
+            </p>
+        </div>
+        
+        <div class="projects-container">
+            {% if projects %}
+                {% if featured_projects %}
+                <!-- Featured Projects Section -->
+                <div class="featured-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-star"></i>
+                        <span class="lang-vi">Dự Án Nổi Bật</span>
+                        <span class="lang-en">Featured Projects</span>
+                    </h2>
+                    
+                    <div class="row">
+                        {% for project in featured_projects %}
+                        <div class="col-lg-6 mb-4">
+                            <div class="project-card featured-card">
+                                {% if project.video %}
+                                <div class="project-video">
+                                    <video controls preload="metadata" class="w-100">
+                                        <source src="{{ project.video.url }}" type="video/mp4">
+                                        <span class="lang-vi">Trình duyệt của bạn không hỗ trợ video.</span>
+                                        <span class="lang-en">Your browser does not support the video tag.</span>
+                                    </video>
+                                </div>
+                                {% elif project.thumbnail %}
+                                <div class="project-thumbnail">
+                                    <img src="{{ project.thumbnail.url }}" alt="{{ project.title }}" class="w-100">
+                                </div>
+                                {% endif %}
+                                
+                                <div class="project-content">
+                                    <h3 class="project-title">
+                                        <span class="lang-vi">{{ project.title }}</span>
+                                        <span class="lang-en">{{ project.title_en|default:project.title }}</span>
+                                    </h3>
+                                    
+                                    <div class="project-meta">
+                                        <span class="project-date">
+                                            <i class="fas fa-calendar"></i>
+                                            {{ project.start_date|date:"M Y" }} - 
+                                            {% if project.is_ongoing %}
+                                                <span class="lang-vi">Hiện tại</span>
+                                                <span class="lang-en">Present</span>
+                                            {% else %}
+                                                {{ project.end_date|date:"M Y" }}
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="project-description">
+                                        <div class="lang-vi">{{ project.description|linebreaks }}</div>
+                                        <div class="lang-en">{{ project.description_en|default:project.description|linebreaks }}</div>
+                                    </div>
+                                    
+                                    <div class="technologies">
+                                        <h5>
+                                            <span class="lang-vi">Công nghệ sử dụng:</span>
+                                            <span class="lang-en">Technologies used:</span>
+                                        </h5>
+                                        <div class="tech-tags">
+                                            <div class="lang-vi">
+                                                {% for tech in project.technology_list %}
+                                                    <span class="tech-tag">{{ tech }}</span>
+                                                {% endfor %}
+                                            </div>
+                                            <div class="lang-en">
+                                                {% for tech in project.technology_list_en %}
+                                                    <span class="tech-tag">{{ tech }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="project-links">
+                                        {% if project.github_url %}
+                                        <a href="{{ project.github_url }}" target="_blank" class="project-link">
+                                            <i class="fab fa-github"></i>
+                                            <span>GitHub</span>
+                                        </a>
+                                        {% endif %}
+                                        {% if project.live_demo_url %}
+                                        <a href="{{ project.live_demo_url }}" target="_blank" class="project-link">
+                                            <i class="fas fa-external-link-alt"></i>
+                                            <span class="lang-vi">Demo</span>
+                                            <span class="lang-en">Live Demo</span>
+                                        </a>
+                                        {% endif %}
+                                        <a href="{% url 'portfolio:project_detail' project.id %}" class="project-link">
+                                            <i class="fas fa-info-circle"></i>
+                                            <span class="lang-vi">Chi tiết</span>
+                                            <span class="lang-en">Details</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if regular_projects %}
+                <!-- Regular Projects Section -->
+                <div class="regular-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-code"></i>
+                        <span class="lang-vi">Dự Án Khác</span>
+                        <span class="lang-en">Other Projects</span>
+                    </h2>
+                    
+                    <div class="row">
+                        {% for project in regular_projects %}
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="project-card">
+                                {% if project.thumbnail %}
+                                <div class="project-thumbnail">
+                                    <img src="{{ project.thumbnail.url }}" alt="{{ project.title }}" class="w-100">
+                                    {% if project.video %}
+                                    <div class="video-overlay">
+                                        <i class="fas fa-play-circle"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                                
+                                <div class="project-content">
+                                    <h4 class="project-title">
+                                        <span class="lang-vi">{{ project.title }}</span>
+                                        <span class="lang-en">{{ project.title_en|default:project.title }}</span>
+                                    </h4>
+                                    
+                                    <div class="project-description">
+                                        <div class="lang-vi">{{ project.description|truncatewords:20 }}</div>
+                                        <div class="lang-en">{{ project.description_en|default:project.description|truncatewords:20 }}</div>
+                                    </div>
+                                    
+                                    <div class="technologies">
+                                        <div class="tech-tags">
+                                            <div class="lang-vi">
+                                                {% for tech in project.technology_list|slice:":3" %}
+                                                    <span class="tech-tag">{{ tech }}</span>
+                                                {% endfor %}
+                                                {% if project.technology_list|length > 3 %}
+                                                    <span class="tech-more">+{{ project.technology_list|length|add:"-3" }}</span>
+                                                {% endif %}
+                                            </div>
+                                            <div class="lang-en">
+                                                {% for tech in project.technology_list_en|slice:":3" %}
+                                                    <span class="tech-tag">{{ tech }}</span>
+                                                {% endfor %}
+                                                {% if project.technology_list_en|length > 3 %}
+                                                    <span class="tech-more">+{{ project.technology_list_en|length|add:"-3" }}</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="project-links">
+                                        <a href="{% url 'portfolio:project_detail' project.id %}" class="project-link primary">
+                                            <span class="lang-vi">Xem chi tiết</span>
+                                            <span class="lang-en">View Details</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            {% else %}
+            <!-- Empty State -->
+            <div class="coming-soon-card">
+                <div class="coming-soon-icon">
+                    <i class="fas fa-plus-circle"></i>
+                </div>
+                
+                <h2 class="coming-soon-title">
+                    <span class="lang-vi">Chưa có dự án nào</span>
+                    <span class="lang-en">No Projects Yet</span>
+                </h2>
+                
+                <p class="coming-soon-description">
+                    <span class="lang-vi">
+                        Các dự án sẽ được cập nhật sớm. Trong thời gian chờ đợi, bạn có thể xem CV chi tiết 
+                        hoặc quay lại trang chủ để tìm hiểu thêm về tôi.
+                    </span>
+                    <span class="lang-en">
+                        Projects will be updated soon. In the meantime, you can view 
+                        my detailed CV or return to the homepage to learn more about me.
+                    </span>
+                </p>
+                
+                <div class="navigation-links">
+                    <a href="{% url 'portfolio:home' %}" class="nav-btn">
+                        <i class="fas fa-home"></i>
+                        <span class="lang-vi">Trang Chủ</span>
+                        <span class="lang-en">Homepage</span>
+                    </a>
+                    
+                    <a href="{% url 'portfolio:cv' %}" class="nav-btn">
+                        <i class="fas fa-file-alt"></i>
+                        <span class="lang-vi">Xem CV</span>
+                        <span class="lang-en">View CV</span>
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'portfolio/js/projects.js' %}"></script>
+</body>
+</html>
